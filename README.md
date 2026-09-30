@@ -29,6 +29,14 @@ Open a *new* terminal after install so it picks up the PATH change.)
 
 - If your terminal's current directory is **inside a git repo**, that repo is
   pre-selected automatically; otherwise the **last repo you used** is shown.
+- To skip picking, pass both commits (any hash or ref):
+
+  ```
+  hashdiff 1a2b3c4 HEAD
+  ```
+
+  Commit A and Commit B are pre-filled and the comparison starts as soon as the window
+  opens. Passing only one commit pre-fills Commit A and waits for you.
 
 Then:
 1. Pick a **Branch:** — this scopes the list of commits (defaults to the checked-out

@@ -11,9 +11,20 @@
     you used is shown. Peer tool to BranchDiff (which diffs two branches).
 .PARAMETER LaunchDir
     Directory to detect a git repo from (defaults to the current directory).
+.PARAMETER CommitA
+    Optional commit-ish (hash or ref) to pre-fill as Commit A (left side).
+.PARAMETER CommitB
+    Optional commit-ish (hash or ref) to pre-fill as Commit B (right side). When both
+    commits are given, the comparison starts automatically once the window opens.
 #>
 
-param([string]$LaunchDir = (Get-Location).Path)
+# Only the commits are positional, so `hashdiff <A> <B>` binds correctly when PowerShell
+# runs this script directly (it prefers HashDiff.ps1 over hashdiff.cmd on PATH).
+param(
+    [Parameter()][string]$LaunchDir = (Get-Location).Path,
+    [Parameter(Position = 0)][string]$CommitA = '',
+    [Parameter(Position = 1)][string]$CommitB = ''
+)
 
 Set-StrictMode -Version Latest
 $ErrorActionPreference = 'Stop'
@@ -511,5 +522,23 @@ if ($txtRepo.Text) {
 } elseif (-not $txtTool.Text) {
     Set-Status 'Browse to a git repository to begin. (Beyond Compare not auto-detected - set the diff tool path.)' $true
 }
+
+# Command-line commits override the defaults. Applied once the window is shown, because
+# creating a combo's handle re-applies its SelectedIndex and would overwrite earlier text.
+# SelectedIndex is cleared first so the list default cannot win.
+$form.Add_Shown({
+    if ($CommitA) {
+        $cmbCommitA.SelectedIndex = -1
+        $cmbCommitA.Text = $CommitA.Trim()
+    }
+    if ($CommitB) {
+        $cmbCommitB.SelectedIndex = -1
+        $cmbCommitB.Text = $CommitB.Trim()
+    }
+    if ($CommitA -and $CommitB) {
+        # Compare validates repo, tool and both commits, and reports any problem in the status line.
+        $btnCompare.PerformClick()
+    }
+})
 
 [void]$form.ShowDialog()

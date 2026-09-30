@@ -6,4 +6,6 @@ REM
 REM Delegates to HashDiff.vbs (via wscript) which launches the GUI fully detached and
 REM windowless, so you can close this terminal and the app keeps running with no
 REM lingering PowerShell window. "%CD%" tells it which directory to detect a repo from.
-wscript.exe "%~dp0HashDiff.vbs" "%CD%"
+REM
+REM Optional: `hashdiff <commitA> <commitB>` pre-fills both commits and starts the compare.
+wscript.exe "%~dp0HashDiff.vbs" "%CD%" %1 %2
